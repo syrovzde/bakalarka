@@ -11,30 +11,49 @@ def extract_data(text, name):
     return df
 
 
+def home_away(line):
+    full_match_name = line.split(" - ")
+    if len(full_match_name) == 1:
+        full_match_name = line.split(" v ")
+        if len(full_match_name) == 1:
+            full_match_name = line.split(" vs ")
+            if len(full_match_name) == 1:
+                home = ""
+                away = ""
+            else:
+                home = full_match_name[0]
+                away = full_match_name[1]
+        else:
+            home = full_match_name[0]
+            away = full_match_name[1]
+    else:
+        home = full_match_name[0]
+        away = full_match_name[1]
+    return home, away
+
+
+def certainity(line):
+    try:
+        certainity = float(line[0:2])
+    except ValueError:
+        try:
+            certainity = float(line[0])
+        except ValueError:
+            certainity = 0
+    return certainity
+
+
 def parseData(bet, name):
     if bet == '':
         return None
     data = bet.split("\n")
     match = model.Matches()
     match.Name = name
-    full_match_name = data[1].split(" - ")
-    if len(full_match_name) == 1:
-        full_match_name = data[1].split(" v ")
-        if len(full_match_name) == 1:
-            full_match_name = data[1].split(" vs ")
-            if len(full_match_name) == 1:
-                match.Home = ""
-                match.Away = ""
-            else:
-                match.Home = full_match_name[0]
-                match.Away = full_match_name[1]
+    match.Home, match.Away = home_away(data[1])
     match.Odds = float(data[2].split("@")[1])
     match.Type = data[2]
     hlp = data[3].split(" ")
-    try:
-        match.Certainity = float(data[3][0:2])
-    except ValueError:
-        match.Certainity = float(data[3][0])
+    match.Certainity = certainity(data[3])
     # sometimes "LIVE" occurs before bookmaker name
     if hlp[1] == "LIVE":
         match.Bookmaker = hlp[2]
