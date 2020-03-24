@@ -5,7 +5,9 @@ import method
 
 
 class Bettor:
-
+    """
+    Creates bettors and let them bet randomly and see how well they do
+    """
     def __init__(self, data, fraction, bankroll, iterations, threshold):
         self.data = data
         self.fraction = fraction

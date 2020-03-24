@@ -11,6 +11,11 @@ import blogabet.sql as db
 
 
 def get_chromewebdriver(chrome_options=None):
+    """
+
+    :param chrome_options: specified options to driver
+    :return:configured chrome driver for selenium
+    """
     if chrome_options is None:
         chrome_options = selenium.webdriver.chrome.options.Options()
         chrome_options.add_argument("--headless")
@@ -21,6 +26,12 @@ def get_chromewebdriver(chrome_options=None):
 
 
 def crawl(urls, names):
+    """
+
+    :param urls:list of url to crawl
+    :param names:  list of names corresponding to urls
+    Get Html from site parses it and writes to database
+    """
     browser = get_chromewebdriver(chrome_options=None)
     Session = db.prepare_database(configuration.database_url, configuration.declarative_base)
     for url, name in zip(urls, names):
@@ -38,6 +49,13 @@ def crawl(urls, names):
 
 
 def crawl_url(url, browser):
+    """
+
+    :param url: url to crawl
+    :param browser:  driver for selenium
+    :return HTML as whole page content
+    :return bet list from the page as text
+    """
     browser.get(url)
     try:
         picks = int(browser.find_element_by_xpath(xpath='// *[ @ id = "header-picks"]').text)

@@ -7,9 +7,15 @@ from sklearn.metrics import log_loss
 from method import Method
 
 
-class Linear(Method):
+class Regression(Method):
 
     def run(self, model, odds):
+        """
+
+        :param model: "Linear for linear regression", Logistic for logistic regression
+        :param odds: odds for matches
+        :return:
+        """
         market_probabilities = 1 / odds
         n_bets = np.shape(market_probabilities)[0]
         favourites = np.argmin(market_probabilities, axis=1)
@@ -27,6 +33,17 @@ class Linear(Method):
 
 
 def logistic(A, y, market, bettors, n_bets):
+    """
+    Simple logistic regression
+    Creates 2 models:
+        First result = a*market_probability + e
+    :param A: n*p * matrix n is number of bets used for regression and p is number of parameteres
+    :param y: vector of results 0 zero if favourite lost 1 if won
+    :param market:
+    :param bettors:
+    :param n_bets:
+    :return:
+    """
     b_model = LogisticRegression().fit(A, y)
     predicted_b = b_model.predict(A)
 

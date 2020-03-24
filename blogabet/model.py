@@ -4,6 +4,9 @@ from sqlalchemy.types import Text, Float, Integer
 
 Base = declarative_base()
 
+"""
+model of simple database
+"""
 
 class Bettor(Base):
     __tablename__ = "bettor_html"

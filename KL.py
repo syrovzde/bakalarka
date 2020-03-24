@@ -4,7 +4,9 @@ import method
 
 
 class KL(method.Method):
-
+    """
+    Class to calculate KL-divergence(distance) of stretegy from random one
+    """
     def __init__(self, data, bet_choices):
         super().__init__(data=data, bet_choices=bet_choices)
 

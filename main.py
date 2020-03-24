@@ -5,7 +5,7 @@ import Bettor
 import method
 from KL import KL
 from generating_method import GeneratingMethod
-from linear_regression import Linear
+from regression import Regression
 
 
 def getResults(bets):
@@ -96,7 +96,7 @@ def kl_divergence(data, closed=True, margin='basic'):
 
 
 def regression(data, odds):
-    linear = Linear(data=data, bet_choices=3)
+    linear = Regression(data=data, bet_choices=3)
     lin = linear.run(model="Linear", odds=odds)
     log = linear.run(model="Logistic", odds=odds)
     return lin, log

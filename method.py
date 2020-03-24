@@ -11,7 +11,7 @@ START = ['Draw_start', 'Away_start', 'Home_start']
 
 
 class Method:
-
+    """ kind of abstract class to all the methods """
     def __init__(self, data, bet_choices):
         self.data = data
         self.length = len(data)
