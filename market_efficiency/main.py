@@ -8,12 +8,25 @@ from market_efficiency.generating_method import GeneratingMethod
 from market_efficiency.regression import Regression
 
 
-def getResults(bets):
-    winner = bets['HSC'] != bets['ASC']
-    home = bets['HSC'] > bets['ASC']
+def getResults(results):
+    pom = results.str.split("-", expand=True)
+    HSC = pom[0]
+    ASC = pom[1]
+    winner = HSC != ASC
+    home = HSC > ASC
     results = home.astype(int) + winner.astype(int)
     return results
 
+
+def multiple_tests(test_list, argument_lists):
+    results = []
+    for func, args in zip(test_list, argument_lists):
+        results.append(func(args))
+    return results
+
+
+def random_dict(dict):
+    return random(dict['data'], dict['probabilities'], dict['fair'], dict['closed'], dict['margin'], dict['odds'])
 
 def random(data, probabilities, fair=True, closed=True, margin='basic', odds=None):
     generating = GeneratingMethod(data=data, bet_choices=3)
@@ -22,6 +35,9 @@ def random(data, probabilities, fair=True, closed=True, margin='basic', odds=Non
         odds = find_correct_odds(fair, closed, margin, generating)
     return generating.evaluate(bets=bets, odds=odds)
 
+
+def random_single_dict(dict):
+    return randomSingle(dict['data'], dict['number'], dict['fair'], dict['closed'], dict['margin'], dict['odds'])
 
 def randomSingle(data, number, fair=True, closed=True, margin='basic', odds=None):
     generating = GeneratingMethod(data=data, bet_choices=3)
@@ -45,6 +61,10 @@ def find_correct_odds(fair, closed, margin, generating):
     return odds
 
 
+def bet_favourite_dict(dict):
+    return betFavourite(dict['data'], dict['fair'], dict['closed'], dict['margin'], dict['odds'])
+
+
 def betFavourite(data, fair=True, closed=True, margin="basic", odds=None):
     generating = method.Method(data, bet_choices=3)
     if odds is None:
@@ -52,6 +72,9 @@ def betFavourite(data, fair=True, closed=True, margin="basic", odds=None):
     favourite = np.argmin(odds, axis=1)
     return generating.evaluate(bets=favourite, odds=odds)
 
+
+def bet_Underdog_dict(dict):
+    return betUnderdog(dict['data'], dict['fair'], dict['closed'], dict['margin'], dict['odds'])
 
 def betUnderdog(data, fair=True, closed=True, margin="basic", odds=None):
     generating = method.Method(data, bet_choices=3)
@@ -67,6 +90,10 @@ def bettorWithBankroll(data, fraction, bankroll, iterations, threshold, odds):
     return bettor.bankroll, iteration
 
 
+def bettors_with_bankroll_dict(dict):
+    return bettorsWithBankroll(dict['data'], dict['count'], dict['fraction'], dict['bankroll'], dict['iterations'],
+                               dict['threshold'], dict['odds'])
+
 def bettorsWithBankroll(data, count, fraction, bankroll, iterations, threshold, odds):
     bankrolls = np.zeros(count)
     iteration = np.zeros(count)
@@ -76,7 +103,11 @@ def bettorsWithBankroll(data, count, fraction, bankroll, iterations, threshold, 
     return bankrolls, iteration
 
 
-def devideBet(data, margin="basic", prob=None):
+def devide_bet_dict(dict):
+    return devide_bet(dict['data'], dict['margin'], dict['prob'])
+
+
+def devide_bet(data, margin="basic", prob=None):
     generating = method.Method(data, bet_choices=3)
     odds = generating.find_fair_odds(margin)
     if prob is None:
@@ -90,9 +121,17 @@ def devideBet(data, margin="basic", prob=None):
     return eval
 
 
+def kl_divergence_dict(dict):
+    return kl_divergence(dict['data'], dict['closed'], dict['margin'])
+
+
 def kl_divergence(data, closed=True, margin='basic'):
     kl = KL(data=data, bet_choices=3)
     return kl.run(closed=closed, margin=margin)
+
+
+def regression_dict(dict):
+    return regression(dict['data'], dict['odds'])
 
 
 def regression(data, odds):
@@ -100,3 +139,8 @@ def regression(data, odds):
     lin = linear.run(model="Linear", odds=odds)
     log = linear.run(model="Logistic", odds=odds)
     return lin, log
+
+
+if __name__ == '__main__':
+    df = pandas.DataFrame(['5-5', '5-4', '3-5'], columns=['result'])
+    print(getResults(df['result']))
