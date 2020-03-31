@@ -9,6 +9,8 @@ import blogabet.model as model
 """
 For easier work with database
 """
+
+
 def make_engine(url):
     """creates engine linking to database"""
     return create_engine(url, echo=True)

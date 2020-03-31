@@ -13,10 +13,10 @@ import re
 
 """
 
+
 def crawl():
     df = pandas.read_csv("updated_list.csv")
     crawler.crawl(df['url'], df['name'])
-
 
 
 if __name__ == '__main__':

@@ -8,6 +8,7 @@ Base = declarative_base()
 model of simple database
 """
 
+
 class Bettor(Base):
     __tablename__ = "bettor_html"
     name = Column(Text, primary_key=True)

@@ -21,5 +21,3 @@ def init_db(db_url=''):
     """
     engine = db_connect(db_url)
     return sessionmaker(bind=engine), engine
-
-

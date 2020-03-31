@@ -16,6 +16,7 @@ def extract_data(text, name):
             df.append(match)
     return df
 
+
 def home_away(line):
     """
     :param line: parse home and away team from line in form of: home -/v/vs away
@@ -127,6 +128,7 @@ def data_from_html():
             i += 1
         for match in matches:
             sql.update(Session, match)
+
 
 def parseData(bet, name):
     """
