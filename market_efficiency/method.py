@@ -8,6 +8,11 @@ DRAW = 0
 HOMEWIN = 2
 CLOSED = ['Draw_close', 'Away_close', 'Home_close']
 START = ['Draw_start', 'Away_start', 'Home_start']
+MARKET_1X2 = ['X', '2', '1']
+MARKET_OU = ['Over', 'Under']
+MARKET_AH = ['2', '1']
+MARKET_DC = ['1X', '12', 'X2']
+MARKET_BTS = ['YES', 'NO']
 
 
 class Method:

@@ -18,68 +18,70 @@ def getResults(results):
     return results
 
 
-def multiple_tests(test_list, argument_lists):
-    results = []
-    for func, args in zip(test_list, argument_lists):
-        results.append(func(args))
-    return results
-
-
 def random_dict(dict):
-    return random(dict['data'], dict['probabilities'], dict['fair'], dict['closed'], dict['margin'], dict['odds'])
+    return random(dict['data'], dict['probabilities'], dict['fair'], dict['margin'], dict['odds'])
 
-def random(data, probabilities, fair=True, closed=True, margin='basic', odds=None):
+
+def random(data, probabilities, fair=True, margin='basic', odds=None):
     generating = GeneratingMethod(data=data, bet_choices=3)
     bets = generating.run(probabilities)
     if odds is None:
-        odds = find_correct_odds(fair, closed, margin, generating)
+        odds = find_correct_odds(fair, margin, generating)
     return generating.evaluate(bets=bets, odds=odds)
 
 
-def random_single_dict(dict):
-    return randomSingle(dict['data'], dict['number'], dict['fair'], dict['closed'], dict['margin'], dict['odds'])
+def bet_home_dict(dict):
+    return randomSingle(dict['data'], method.HOMEWIN, dict['fair'], dict['margin'], dict['odds'])
 
-def randomSingle(data, number, fair=True, closed=True, margin='basic', odds=None):
+
+def bet_away_dict(dict):
+    return randomSingle(dict['data'], method.AWAYWIN, dict['fair'], dict['margin'], dict['odds'])
+
+
+def bet_draw_dict(dict):
+    return randomSingle(dict['data'], method.DRAW, dict['fair'], dict['margin'], dict['odds'])
+
+
+def random_single_dict(dict):
+    return randomSingle(dict['data'], dict['number'], dict['fair'], dict['margin'], dict['odds'])
+
+
+def randomSingle(data, number, fair=True, margin='basic', odds=None):
     generating = GeneratingMethod(data=data, bet_choices=3)
     bets = number * np.ones(generating.data['results'].count(), dtype=np.int)
     if odds is None:
-        odds = find_correct_odds(fair, closed, margin, generating)
+        odds = find_correct_odds(fair, margin, generating)
     return generating.evaluate(bets, odds=odds)
 
 
-def find_correct_odds(fair, closed, margin, generating):
+def find_correct_odds(fair, margin, generating, market=method.MARKET_1X2):
     if fair:
-        if closed:
-            odds = generating.find_fair_odds(method=margin, odds_columns=method.CLOSED)
-        else:
-            odds = generating.find_fair_odds(method=margin, odds_columns=method.START)
+        odds = generating.find_fair_odds(method=margin, odds_columns=market)
     else:
-        if closed:
-            odds = generating.find_odds(odds_columns=method.CLOSED)
-        else:
-            odds = generating.find_odds(odds_columns=method.START)
+        odds = generating.find_odds(odds_columns=method.MARKET_1X2)
     return odds
 
 
 def bet_favourite_dict(dict):
-    return betFavourite(dict['data'], dict['fair'], dict['closed'], dict['margin'], dict['odds'])
+    return betFavourite(dict['data'], dict['fair'], dict['margin'], dict['odds'])
 
 
-def betFavourite(data, fair=True, closed=True, margin="basic", odds=None):
+def betFavourite(data, fair=True, margin="basic", odds=None):
     generating = method.Method(data, bet_choices=3)
     if odds is None:
-        odds = find_correct_odds(fair, closed, margin, generating)
+        odds = find_correct_odds(fair, margin, generating)
     favourite = np.argmin(odds, axis=1)
     return generating.evaluate(bets=favourite, odds=odds)
 
 
 def bet_Underdog_dict(dict):
-    return betUnderdog(dict['data'], dict['fair'], dict['closed'], dict['margin'], dict['odds'])
+    return betUnderdog(dict['data'], dict['fair'], dict['margin'], dict['odds'])
 
-def betUnderdog(data, fair=True, closed=True, margin="basic", odds=None):
+
+def betUnderdog(data, fair=True, margin="basic", odds=None):
     generating = method.Method(data, bet_choices=3)
     if odds is None:
-        odds = find_correct_odds(fair, closed, margin, generating)
+        odds = find_correct_odds(fair, margin, generating)
     underdog = np.argmax(odds, axis=1)
     return generating.evaluate(bets=underdog, odds=odds)
 
@@ -122,12 +124,12 @@ def devide_bet(data, margin="basic", prob=None):
 
 
 def kl_divergence_dict(dict):
-    return kl_divergence(dict['data'], dict['closed'], dict['margin'])
+    return kl_divergence(dict['data'], dict['margin'])
 
 
-def kl_divergence(data, closed=True, margin='basic'):
+def kl_divergence(data, margin='basic'):
     kl = KL(data=data, bet_choices=3)
-    return kl.run(closed=closed, margin=margin)
+    return kl.run(margin=margin)
 
 
 def regression_dict(dict):

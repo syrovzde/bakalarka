@@ -12,10 +12,7 @@ class KL(method.Method):
         super().__init__(data=data, bet_choices=bet_choices)
 
     def run(self, closed=True, margin='basic'):
-        if closed:
-            odds = self.find_fair_odds(method=margin, odds_columns=method.CLOSED)
-        else:
-            odds = self.find_fair_odds(method=margin, odds_columns=method.START)
+        odds = self.find_fair_odds(method=margin)
         n_bets = self.data['results'].count()
         outcomes = np.zeros(n_bets)
         for i in range(n_bets):
