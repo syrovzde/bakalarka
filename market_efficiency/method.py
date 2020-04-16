@@ -3,16 +3,11 @@ import pandas
 
 import utils.odds2probs as odds2probs
 
-AWAYWIN = 1
+AWAYWIN = 2
 DRAW = 0
-HOMEWIN = 2
-CLOSED = ['Draw_close', 'Away_close', 'Home_close']
-START = ['Draw_start', 'Away_start', 'Home_start']
-MARKET_1X2 = ['X', '2', '1']
-MARKET_OU = ['Over', 'Under']
-MARKET_AH = ['2', '1']
-MARKET_DC = ['1X', '12', 'X2']
-MARKET_BTS = ['YES', 'NO']
+HOMEWIN = 1
+YES = 1
+NO = 0
 
 
 class Method:
@@ -57,16 +52,24 @@ class Method:
             profit = strategies
         return profit
 
-    def find_fair_odds(self, method='basic', odds_columns=None):
-        odds = self.find_odds(odds_columns)
+    def find_fair_odds(self, method='basic'):
+        odds = self.find_odds()
         prob = odds2probs.implied_probabilities(odds, method, normalize=True)
+        if np.isnan(prob['probabilities']).any():
+            prob['probabilities'] = np.nan_to_num(prob['probabilities'], nan=1 / self.bet_choices)
         return 1 / prob['probabilities']
 
-    def find_odds(self, odds_columns):
+    def find_odds(self):
         odds = np.ones((self.length, self.bet_choices))
-        odds[:, DRAW] = self.data[odds_columns[DRAW]]
-        odds[:, HOMEWIN] = self.data[odds_columns[HOMEWIN]]
-        odds[:, AWAYWIN] = self.data[odds_columns[AWAYWIN]]
+        if self.bet_choices == 2:
+            odds[:, YES] = self.data[str(YES)]
+            odds[:, NO] = self.data[str(NO)]
+        if self.bet_choices == 3:
+            odds[:, DRAW] = self.data[str(DRAW)]
+            odds[:, HOMEWIN] = self.data[str(HOMEWIN)]
+            odds[:, AWAYWIN] = self.data[str(AWAYWIN)]
+        if self.bet_choices > 3:
+            return NotImplementedError
         return odds
 
     def get_probabilities(self):

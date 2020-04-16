@@ -43,7 +43,7 @@ def implied_probabilities(odds: np.ndarray, method='basic', normalize=True):
             try:
                 resroot = root(shin_solvefor, 0, 0.4, args=inverted_odds[ii,])
             except Exception as exc:
-                print("Cannot convert odds to probs: " + ",".join(map(str, odds[ii])))
+                # print("Cannot convert odds to probs: " + ",".join(map(str, odds[ii])))
                 continue
             zvalues[ii] = resroot
             probs[ii,] = shin_func(zz=resroot, io=inverted_odds[ii,])
@@ -67,7 +67,7 @@ def implied_probabilities(odds: np.ndarray, method='basic', normalize=True):
             try:
                 resroot = root(or_solvefor, 0.05, 5, args=inverted_odds[ii,])
             except Exception as exc:
-                print("Cannot convert odds to probs: " + ",".join(map(str, odds[ii])))
+                #print("Cannot convert odds to probs: " + ",".join(map(str, odds[ii])))
                 continue
             odds_ratios[ii] = resroot
             probs[ii,] = or_func(cc=resroot, io=inverted_odds[ii,])
@@ -84,7 +84,7 @@ def implied_probabilities(odds: np.ndarray, method='basic', normalize=True):
             try:
                 resroot = root(pwr_solvefor, 0.001, 1, args=inverted_odds[ii,])
             except Exception as exc:
-                print("Cannot convert odds to probs: " + ",".join(map(str, odds[ii])))
+                #print("Cannot convert odds to probs: " + ",".join(map(str, odds[ii])))
                 continue
             exponents[ii] = resroot
             probs[ii,] = pwr_func(nn=resroot, io=inverted_odds[ii,])

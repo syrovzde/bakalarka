@@ -11,7 +11,6 @@ class Regression(Method):
 
     def run(self, model, odds):
         """
-
         :param model: "Linear for linear regression", Logistic for logistic regression
         :param odds: odds for matches
         :return:
@@ -26,13 +25,13 @@ class Regression(Method):
         A[0] = bettors
         A[1] = market
         if model == 'Linear':
-            return linear(A.T, y, market, bettors, n_bets)
+            return linear(A.T, y, bettors, n_bets)
         elif model == 'Logistic':
-            return logistic(A.T, y, market, bettors, n_bets)
+            return logistic(A.T, y)
         return None
 
 
-def logistic(A, y, market, bettors, n_bets):
+def logistic(A, y):
     """
     Simple logistic regression
     Creates 2 models:
@@ -56,7 +55,7 @@ def logistic(A, y, market, bettors, n_bets):
     return stats.chi2(1).cdf(lr)
 
 
-def linear(A, y, market, bettors, n_bets):
+def linear(A, y, bettors, n_bets):
     p = LinearRegression().fit(A, y)
     bettor_weight = p.coef_[0]
     predicted = p.predict(A)
