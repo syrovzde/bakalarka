@@ -1,13 +1,12 @@
 import numpy as np
 import pandas
-
-import market_efficiency.Bettor as Bettor
-import market_efficiency.method as method
-import re
 import pandas as pd
-from market_efficiency.KL import KL
-from market_efficiency.generating_method import GeneratingMethod
-from market_efficiency.regression import Regression
+
+import Bettor as Bettor
+import method as method
+from KL import KL
+from generating_method import GeneratingMethod
+from regression import Regression
 
 
 def digit_sum(n):
@@ -17,9 +16,30 @@ def digit_sum(n):
     return sum
 
 
+def parse_handicap(handicap: pandas.Series):
+    tmp = []
+    total = handicap.str.split(",")
+    for index, item in total.items():
+        pom = np.array(item, dtype=float)
+        tmp.append(np.average(pom))
+    return np.array(tmp)
+
+
+def asian_handicap_results(results, handicap):
+    pom = results.str.split("-", expand=True)
+    ASC = np.array(pom[1], dtype=float)
+    HSC = np.array(pom[0], dtype=float)
+    totals = parse_handicap(handicap)
+    difference = HSC - ASC
+    shifted_difference = difference + totals
+    shifted_difference[shifted_difference >= 0.5] = 1
+    shifted_difference[shifted_difference <= -0.5] = -1
+    shifted_difference[shifted_difference == 0.25] = 0.5
+    shifted_difference[shifted_difference == -0.25] = -0.5
+    return pandas.Series(shifted_difference)
+
 def bts_results(results):
     pom = results.str.split("-", expand=True)
-    tmp = pom[1] == ''
     ASC = pom[1].astype(int)
     HSC = pom[0].astype(int)
     bet_result = np.logical_and(ASC != 0, HSC != 0)
@@ -36,6 +56,14 @@ def tennis_ou_results(results, total):
     return pandas.Series(totals)
 
 
+def result_sum(results):
+    pom = results.str.split("-", expand=True)
+    ASC = pom[1]
+    HSC = pom[0]
+    match_total = ASC.astype(int) + HSC.astype(int)
+    return match_total
+
+
 def ou_results(results, total, sport):
     total = total.str.findall("\d{1,3}\.*\d*").str[0]
     if sport == 'tennis':
@@ -48,13 +76,19 @@ def ou_results(results, total, sport):
     return (match_total > total).astype(int)
 
 
-def getResults(results, market, total=None, sport='football'):
+def dc_results(results):
+    pom = x12market_results(results)
+
+
+def getResults(results, market, total=None, sport='football', handicap=None):
     if market == "1x2":
         return x12market_results(results)
     if market == "ou":
         return ou_results(results, total, sport)
     if market == "bts":
         return bts_results(results)
+    if market == 'ah':
+        return asian_handicap_results(results, handicap)
 
 
 def x12market_results(results):
@@ -69,10 +103,10 @@ def x12market_results(results):
 
 def random_dict(dict):
     return random(dict['data'], dict['probabilities'], dict['fair'], dict['margin'], dict['odds'], dict['bet_choices'],
-                  dict['n_random'])
+                  dict['n_random'], dict['asian'])
 
 
-def random(data, probabilities=None, fair=True, margin='basic', odds=None, bet_choices=3, n_random=100):
+def random(data, probabilities=None, fair=True, margin='basic', odds=None, bet_choices=3, n_random=100, asian=False):
     generating = GeneratingMethod(data=data, bet_choices=bet_choices)
     if odds is None:
         odds = find_correct_odds(fair, margin, generating)
@@ -80,33 +114,37 @@ def random(data, probabilities=None, fair=True, margin='basic', odds=None, bet_c
         probabilities = 1 / odds
     generating.n_random = n_random
     bets = generating.run(probabilities)
-    return generating.evaluate(bets=bets, odds=odds)
+    return generating.evaluate(bets=bets, odds=odds, asian=asian)
 
 
 def bet_home_dict(dict):
-    return randomSingle(dict['data'], method.HOMEWIN, dict['fair'], dict['margin'], dict['odds'], dict['bet_choices'])
+    return randomSingle(dict['data'], method.HOMEWIN, dict['fair'], dict['margin'], dict['odds'], dict['bet_choices'],
+                        dict['asian'])
 
 
 def bet_away_dict(dict):
     if dict['bet_choices'] == 2:
         return None
-    return randomSingle(dict['data'], method.AWAYWIN, dict['fair'], dict['margin'], dict['odds'], dict['bet_choices'])
+    return randomSingle(dict['data'], method.AWAYWIN, dict['fair'], dict['margin'], dict['odds'], dict['bet_choices'],
+                        dict['asian'])
 
 
 def bet_draw_dict(dict):
-    return randomSingle(dict['data'], method.DRAW, dict['fair'], dict['margin'], dict['odds'], dict['bet_choices'])
+    return randomSingle(dict['data'], method.DRAW, dict['fair'], dict['margin'], dict['odds'], dict['bet_choices'],
+                        dict['asian'])
 
 
 def random_single_dict(dict):
-    return randomSingle(dict['data'], dict['number'], dict['fair'], dict['margin'], dict['odds'], dict['bet_choices'])
+    return randomSingle(dict['data'], dict['number'], dict['fair'], dict['margin'], dict['odds'], dict['bet_choices'],
+                        dict['asian'])
 
 
-def randomSingle(data, number, fair=True, margin='basic', odds=None, bet_choices=3):
+def randomSingle(data, number, fair=True, margin='basic', odds=None, bet_choices=3, asian=False):
     generating = GeneratingMethod(data=data, bet_choices=bet_choices)
     if odds is None:
         odds = find_correct_odds(fair, margin, generating)
     bets = number * np.ones(odds.shape[0], dtype=np.int)
-    return generating.evaluate(bets, odds=odds)
+    return generating.evaluate(bets, odds=odds, asian=asian)
 
 
 def find_correct_odds(fair, margin, generating):
@@ -118,27 +156,27 @@ def find_correct_odds(fair, margin, generating):
 
 
 def bet_favourite_dict(dict):
-    return betFavourite(dict['data'], dict['fair'], dict['margin'], dict['odds'], dict['bet_choices'])
+    return betFavourite(dict['data'], dict['fair'], dict['margin'], dict['odds'], dict['bet_choices'], dict['asian'])
 
 
-def betFavourite(data, fair=True, margin="basic", odds=None, bet_choices=3):
+def betFavourite(data, fair=True, margin="basic", odds=None, bet_choices=3, asian=False):
     generating = method.Method(data, bet_choices=bet_choices)
     if odds is None:
         odds = find_correct_odds(fair, margin, generating)
     favourite = np.argmin(odds, axis=1)
-    return generating.evaluate(bets=favourite, odds=odds)
+    return generating.evaluate(bets=favourite, odds=odds, asian=asian)
 
 
 def bet_Underdog_dict(dict):
-    return betUnderdog(dict['data'], dict['fair'], dict['margin'], dict['odds'], dict['bet_choices'])
+    return betUnderdog(dict['data'], dict['fair'], dict['margin'], dict['odds'], dict['bet_choices'], dict['asian'])
 
 
-def betUnderdog(data, fair=True, margin="basic", odds=None, bet_choices=3):
+def betUnderdog(data, fair=True, margin="basic", odds=None, bet_choices=3, asian=False):
     generating = method.Method(data, bet_choices=bet_choices)
     if odds is None:
         odds = find_correct_odds(fair, margin, generating)
     underdog = np.argmax(odds, axis=1)
-    return generating.evaluate(bets=underdog, odds=odds)
+    return generating.evaluate(bets=underdog, odds=odds, asian=asian)
 
 
 def bettorWithBankroll(data, fraction, bankroll, iterations, threshold, odds):
@@ -175,8 +213,6 @@ def devide_bet(data, margin="basic", prob=None, bet_choices=3):
     eval = np.zeros(prob.shape)
     for i in range(n_bet):
         eval[i, np_results[i]] = odds[i, np_results[i]] * prob[i, np_results[i]]
-    #print(np.max(eval,axis=0))
-    print((np.sum(eval) - n_bet) / n_bet)
     return eval
 
 
@@ -200,3 +236,10 @@ def regression(data, bet_choices=3, fair=True, margin='basic'):
     log = linear.run(model="Logistic", odds=odds)
     return lin, log
 
+
+if __name__ == '__main__':
+    results = ['1-1', '1-3', '2-2', '3-3']
+    totals = ['0,-0.5', '0,+1.5', '+0.5', '-0.5']
+    results = pd.Series(results)
+    totals = pd.Series(totals)
+    print(asian_handicap_results(results, totals))

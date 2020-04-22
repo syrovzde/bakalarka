@@ -1,8 +1,7 @@
 import numpy as np
 import pandas
 
-import market_efficiency.method as method
-
+import method as method
 
 class Bettor:
     """

@@ -1,6 +1,6 @@
 import numpy as np
 
-import market_efficiency.method as method
+import method as method
 
 
 class KL(method.Method):

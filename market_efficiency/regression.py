@@ -4,7 +4,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import log_loss
 
-from market_efficiency.method import Method
+from method import Method
 
 
 class Regression(Method):

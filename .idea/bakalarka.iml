@@ -6,7 +6,7 @@
       <sourceFolder url="file://$MODULE_DIR$/bettor_skill" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/blogabet" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/market_efficiency" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/utils" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/market_efficiency/utils" isTestSource="false" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

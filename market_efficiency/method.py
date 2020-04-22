@@ -25,11 +25,25 @@ class Method:
         return NotImplementedError
 
     def compareBets(self, bets):
-        results = pandas.Series.to_numpy(self.data['results'], dtype=int)
+        results = pandas.Series.to_numpy(self.data['results'], dtype=float)
         result = results == bets
         return result
 
-    def evaluateStrategy(self, bets, odds, results):
+    def compare_asian_bet(self, bets: np.ndarray):
+        # transforming [0,1] -> [-1,1]
+        bets = 2 * bets - 1
+        results = pandas.Series.to_numpy(self.data['results'], dtype=float)
+        results = results * bets
+        results[results >= 1] = 1
+        results[results == 0.25] = 0.5
+        change = -1 * np.ones(results.shape)
+        change[results == -0.25] = -0.5
+        change[results == 0] = 0
+        results[results <= -1] = 0
+        results[results == -0.25] = 0
+        return results, change
+
+    def evaluateStrategy(self, bets, odds, results, asian, change):
         strategies = np.ones(bets.shape)
         if np.ndim(bets) == 1:
             n = 1
@@ -39,12 +53,19 @@ class Method:
             n = bets.shape[1]
             for i in range(n):
                 strategies[:, i] = odds[i, bets[:, i]]
-        strategies = strategies * results - 1
+        if asian:
+            strategies = strategies * results + change
+        else:
+            strategies = strategies * results -1
         return strategies, n
 
-    def evaluate(self, bets, odds):
-        results = self.compareBets(bets)
-        strategies, n = self.evaluateStrategy(bets, odds, results)
+    def evaluate(self, bets, odds, asian):
+        change = None
+        if asian:
+            results, change = self.compare_asian_bet(bets=bets)
+        else:
+            results = self.compareBets(bets)
+        strategies, n = self.evaluateStrategy(bets, odds, results, asian, change)
         # in case of evaluating multiple strategies at the time
         if n != 1:
             profit = np.mean(strategies, axis=1)

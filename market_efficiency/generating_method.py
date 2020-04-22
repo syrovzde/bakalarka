@@ -1,6 +1,6 @@
 import numpy as np
 
-from market_efficiency.method import Method
+from method import Method
 
 
 class GeneratingMethod(Method):
