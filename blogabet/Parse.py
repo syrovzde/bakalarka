@@ -1,6 +1,6 @@
 import blogabet.model as model
 import blogabet.sql as sql
-import lxml
+import lxml.html
 import blogabet.configuration
 
 
@@ -69,7 +69,7 @@ def parse_different(text, name):
     match.Home, match.Away = home_away(text[3])
     match.Type = text[4]
     try:
-        match.odds = float(text[5][1:])
+        match.Odds = float(text[5][1:])
     except ValueError:
         return None
     match.Certainity = certainity(text[6])
@@ -145,7 +145,7 @@ def parseData(bet, name):
     match.Home, match.Away = home_away(data[1])
     try:
         match.Odds = float(data[2].split("@")[1])
-    except ValueError:
+    except :
         return None
     match.Type = data[2]
     hlp = data[3].split(" ")

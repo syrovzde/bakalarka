@@ -9,9 +9,6 @@ import blogabet.Parse
 import os
 import re
 
-"""
-
-"""
 
 
 def crawl():
@@ -20,4 +17,5 @@ def crawl():
 
 
 if __name__ == '__main__':
+    print()
     crawl()

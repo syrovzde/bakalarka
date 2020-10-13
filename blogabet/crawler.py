@@ -40,7 +40,7 @@ def crawl(urls, names):
             print("existed")
             continue
         html, text = crawl_url(browser=browser, url=url)
-        if html is not None:
+        if html is not None and text is not None:
             matches = parse.extract_data(text, name)
             db.update(Session, model.Bettor(name=name, HTML=html, url=url))
             for match in matches:
@@ -77,7 +77,11 @@ def crawl_url(url, browser):
         time.sleep(1.5)
         print("Iteration {i} out of {count} finished".format(i=i, count=iteration_count))
         i += 1
+
     html = browser.page_source
-    text = browser.find_element_by_xpath(xpath='/html/body/div[2]/section[2]/div[2]/div[1]/div[4]/ul/div/ul').text
+    try:
+        text = browser.find_element_by_xpath(xpath='/html/body/div[2]/section[2]/div[2]/div[1]/div[4]/ul/div/ul').text
+    except selenium.common.exceptions.NoSuchElementException:
+        text = None
 
     return html, text

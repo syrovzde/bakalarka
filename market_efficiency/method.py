@@ -15,8 +15,12 @@ class Method:
 
     def __init__(self, data, bet_choices):
         self.data = data
-        self.length = len(data)
+        if data is None:
+            self.length = 0
+        else:
+            self.length = len(data)
         self.bet_choices = bet_choices
+        self.results = None
 
     def run(self):
         return NotImplementedError
@@ -25,14 +29,20 @@ class Method:
         return NotImplementedError
 
     def compareBets(self, bets):
-        results = pandas.Series.to_numpy(self.data['results'], dtype=float)
+        if self.results is None:
+            results = pandas.Series.to_numpy(self.data['results'], dtype=float)
+        else:
+            results = pandas.Series.to_numpy(self.results, dtype=float)
         result = results == bets
         return result
 
     def compare_asian_bet(self, bets: np.ndarray):
         # transforming [0,1] -> [-1,1]
         bets = 2 * bets - 1
-        results = pandas.Series.to_numpy(self.data['results'], dtype=float)
+        if self.results is None:
+            results = pandas.Series.to_numpy(self.data['results'], dtype=float)
+        else:
+            results = pandas.Series.to_numpy(self.results, dtype=float)
         results = results * bets
         results[results >= 1] = 1
         results[results == 0.25] = 0.5
