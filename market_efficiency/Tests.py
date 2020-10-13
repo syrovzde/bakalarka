@@ -138,24 +138,24 @@ class Tests:
         if Tests.random_tests in self.test_list:
             plt.figure()
             self.results['random'].boxplot()
-            plt.savefig(self.png_path + self.name+"_random.png")
+            #plt.savefig(self.png_path + self.name+"_random.png")
         if Tests.simple_tests in self.test_list:
             plt.figure()
             self.results['opened_simple'].cumsum().plot()
             plt.title(self.name + "opening")
-            plt.savefig(self.png_path + self.name+ "_opened_simple.png")
+            #plt.savefig(self.png_path + self.name+ "_opened_simple.png")
             plt.figure()
             self.results['closed_simple'].cumsum().plot()
             plt.title(self.name + 'closing')
-            plt.savefig(self.png_path + self.name+'_closed_simple.png')
+            #plt.savefig(self.png_path + self.name+'_closed_simple.png')
         if Tests.devide_bet_test in self.test_list:
             if self.market != 'ah' and self.market != 'ha':
                 plt.figure()
                 self.results['devide']['closed'].cumsum().plot()
-                plt.savefig(self.png_path + self.name+'_closed_devide.png')
+                #plt.savefig(self.png_path + self.name+'_closed_devide.png')
                 plt.figure()
                 self.results['devide']['open'].cumsum().plot()
-                plt.savefig(self.png_path + self.name+'_open_devide.png')
+                #plt.savefig(self.png_path + self.name+'_open_devide.png')
         if Tests.kl_test in self.test_list:
             if self.market != 'ah' and self.market != 'ha':
                 f = open(self.txt_path + self.name+".txt",'w')

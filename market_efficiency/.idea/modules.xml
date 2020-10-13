@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/../blogabet/.idea/blogabet.iml" filepath="$PROJECT_DIR$/../blogabet/.idea/blogabet.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/market_efficiency.iml" filepath="$PROJECT_DIR$/.idea/market_efficiency.iml" />
     </modules>
   </component>
