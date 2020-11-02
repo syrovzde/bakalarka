@@ -73,9 +73,9 @@ def parse_handicap(handicap: pandas.Series,from_string = True):
     tmp = []
     try:
         total = handicap.str.split(",")
-        total = total.str.split(" ")
+        #total = total.str.split(" ")
     except:
-        otal = handicap
+        total = handicap
     for index, item in total.items():
         pom = np.array(item, dtype=float)
         av = np.average(pom)

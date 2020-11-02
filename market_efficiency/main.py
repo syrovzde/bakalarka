@@ -98,6 +98,7 @@ def load_data(schema=None, market=None, dtb_url=default_dtb,to_numpy = False,csv
         df['results'] = hlp.getResults(df['Result'], market, df['Total'], sport=schema)
     elif market == 'ah':
         df['results'] = hlp.getResults(results=df['Result'], market=market, handicap=df['Handicap'], sport=schema,from_string =not csv)
+        df = df.dropna()
     elif market == '1x2':
         df['results'] = hlp.getResults(df['Result'], market)
     else:
